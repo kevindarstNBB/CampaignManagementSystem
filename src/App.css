@@ -470,3 +470,65 @@ tr.dev-high { border-left: 3px solid var(--red); }
 .sc-row-undone td:last-child, .sc-row-undone td:first-child { opacity: 1; text-decoration: none; }
 .sc-selected-count { font-size: 12px; color: var(--accent); font-weight: 600; }
 table.session-changes-table input[type="checkbox"] { accent-color: var(--accent); cursor: pointer; }
+
+/* ─── Mobile ──────────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  /* App shell */
+  .app { height: 100dvh; }
+  .app-body { padding: 10px 12px; gap: 10px; }
+
+  /* Header */
+  .app-header { flex-direction: column; align-items: flex-start; gap: 6px; padding: 10px 14px; }
+  .app-header h1 { font-size: 15px; }
+  .seed-date { display: block; margin-left: 0; margin-top: 2px; }
+  .header-actions { width: 100%; justify-content: flex-start; flex-wrap: wrap; gap: 6px; }
+  .header-dropdown-menu { min-width: 140px; }
+
+  /* Filter bar */
+  .filter-bar { padding: 8px 10px; gap: 6px; }
+  .filter-bar select, .filter-bar input { min-width: 0; flex: 1 1 120px; min-height: 36px; font-size: 14px; }
+  .filter-bar input[type="text"] { min-width: 0; flex: 1 1 100%; }
+  .year-multi-btn { min-width: 0; min-height: 36px; font-size: 14px; }
+  .year-multi-dropdown { min-width: 110px; }
+
+  /* Preset bar */
+  .preset-bar { flex-wrap: wrap; gap: 6px; }
+  .preset-btn { padding: 4px 8px; }
+
+  /* Summary cards */
+  .summary-cards { grid-template-columns: 1fr 1fr; gap: 8px; }
+
+  /* Grid toolbar */
+  .grid-toolbar { gap: 6px; }
+  .grid-toolbar .btn { font-size: 12px; padding: 5px 8px; min-height: 32px; }
+
+  /* Data grid */
+  table.data-grid { font-size: 12px; }
+  table.data-grid th { padding: 7px 8px; font-size: 11px; }
+  table.data-grid td { padding: 6px 8px; }
+
+  /* Modals & panels — full screen on mobile */
+  .detail-panel { width: 100vw; max-width: 100vw; }
+  .modal { width: 100vw; max-width: 100vw; max-height: 100vh; border-radius: 0; }
+  .import-modal { width: 100vw; max-width: 100vw; }
+  .bulk-edit-modal { width: 100vw; max-width: 100vw; }
+  .modal-header { padding: 12px 14px; }
+  .modal-body { padding: 12px 14px; }
+  .detail-header { padding: 12px 14px; }
+  .detail-body { padding: 12px 14px; }
+  .detail-tabs button { padding: 8px 10px; font-size: 12px; }
+
+  /* Column picker */
+  .col-picker-panel { width: 240px; max-width: 80vw; }
+
+  /* Chart */
+  .chart-svg { min-height: 200px; }
+  .chart-wrap { padding: 10px; }
+
+  /* Touch-friendly sizing */
+  .btn { min-height: 34px; }
+  select, input { min-height: 34px; }
+
+  /* Feedback panel */
+  .feedback-form textarea { min-height: 80px; }
+}
