@@ -4058,6 +4058,7 @@ function App() {
   });
   const [currentUser, setCurrentUser] = useState(() => localStorage.getItem('cms_username') || '');
   const [showUserPrompt, setShowUserPrompt] = useState(() => !localStorage.getItem('cms_username'));
+  const [seedDate, setSeedDate] = useState(() => localStorage.getItem('cms_seed_date') || '');
   const [showActivityLog, setShowActivityLog] = useState(false);
   const [showSessionChanges, setShowSessionChanges] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
@@ -4644,6 +4645,7 @@ function App() {
     <div className="app">
       <header className="app-header">
         <h1>AMBA Marketing Campaign Manager</h1>
+        {seedDate && <span className="seed-date">Seed: {seedDate}</span>}
         <div className="header-actions">
           <button className="btn btn-sm" onClick={() => setTheme(t => t === 'dark' ? 'light' : 'dark')} title="Toggle theme">
             {theme === 'dark' ? '\u2600\uFE0F' : '\uD83C\uDF19'}
@@ -4664,6 +4666,9 @@ function App() {
                   return raw;
                 });
                 downloadJSON(strip, 'pipeline_data.json');
+                const now = new Date().toLocaleDateString();
+                localStorage.setItem('cms_seed_date', now);
+                setSeedDate(now);
                 setToast(`Exported ${strip.length} records as seed data`);
               }}>Export Seed Data</button>
               <hr style={{ margin: '4px 0', border: 'none', borderTop: '1px solid var(--border)' }} />
