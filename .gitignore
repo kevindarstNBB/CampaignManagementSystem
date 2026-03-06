@@ -25,3 +25,10 @@ dist-ssr
 
 # Real pipeline data (keep local only)
 src/pipeline_data.json
+
+# Azure Functions
+api/node_modules
+api/local.settings.json
+__azurite_db*
+__blobstorage__
+__queuestorage__
