@@ -4653,12 +4653,12 @@ function App() {
           <span className="user-badge" onClick={() => setShowUserPrompt(true)} title="Change user">
             {currentUser || 'Set User'}
           </span>
+          <button className="btn" onClick={() => setShowFeedback(true)}>Feedback</button>
           <div className="header-dropdown" tabIndex={0}>
             <button className="btn header-dropdown-btn">Tools</button>
             <div className="header-dropdown-menu">
               <button className="btn" onClick={() => setShowSessionChanges(true)}>Session Changes</button>
               <button className="btn" onClick={() => setShowActivityLog(true)}>Activity Log</button>
-              <button className="btn" onClick={() => setShowFeedback(true)}>Feedback</button>
               <button className="btn" onClick={() => {
                 const strip = data.map(r => {
                   const raw = {};
