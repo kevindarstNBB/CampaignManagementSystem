@@ -135,6 +135,14 @@ function downloadCSV(rows, filename) {
   URL.revokeObjectURL(url);
 }
 
+function downloadExcel(rows, filename) {
+  if (!rows.length) return;
+  const ws = XLSX.utils.json_to_sheet(rows);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+  XLSX.writeFile(wb, filename.endsWith('.xlsx') ? filename : `${filename}.xlsx`);
+}
+
 function downloadJSON(data, filename) {
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
@@ -1559,6 +1567,27 @@ function SummaryView({ data, allData, exportRef, onExport }) {
           </div>
         )}
         {onExport && <button className="btn btn-sm" onClick={onExport}>Export PNG</button>}
+        <button className="btn btn-sm" onClick={() => {
+          const rows = (showYoy ? yoyRows : standardRows).map(r => {
+            const row = { [groupLabel]: r.label };
+            if (showYoy) {
+              for (const m of activeMeasures) {
+                row[`${m.label} (${curYear})`] = r.cur[m.key];
+                row[`${m.label} (${priorYear})`] = r.prior[m.key];
+                row[`${m.label} Delta`] = r.delta[m.key];
+              }
+            } else {
+              for (const m of activeMeasures) row[m.label] = r[m.key];
+              if (multiYear) {
+                for (const yr of filteredYears) {
+                  for (const m of activeMeasures) row[`${m.label} (${yr})`] = r.byYear?.[yr]?.[m.key] ?? 0;
+                }
+              }
+            }
+            return row;
+          });
+          downloadExcel(rows, `Summary_${groupLabel}_${new Date().toISOString().slice(0,10)}`);
+        }}>Export Excel</button>
       </div>
       <table className="summary-table">
         <thead>
@@ -2238,6 +2267,14 @@ function ExportTab({ record }) {
       <div className="export-card">
         <div><h4>Asana Export</h4><p>Task format with custom fields for project management</p></div>
         <button className="btn btn-primary" onClick={exportAsana}>Export JSON</button>
+      </div>
+      <div className="export-card">
+        <div><h4>Excel Export</h4><p>All pipeline fields as .xlsx spreadsheet</p></div>
+        <button className="btn btn-primary" onClick={() => {
+          const row = {};
+          PIPELINE_FIELDS.forEach(f => { row[f] = record[f] ?? ''; });
+          downloadExcel([row], `pipeline_${record.PROJ_NUM}`);
+        }}>Export Excel</button>
       </div>
     </div>
   );
