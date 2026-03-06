@@ -4003,7 +4003,13 @@ function App() {
   const [showModal, setShowModal] = useState(false);
   const [editRecord, setEditRecord] = useState(null);
   const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'summary'
-  const [visibleCols, setVisibleCols] = useState(() => new Set(DEFAULT_VISIBLE_COLS));
+  const [visibleCols, setVisibleCols] = useState(() => {
+    try {
+      const stored = localStorage.getItem('cms_visible_cols');
+      if (stored) return new Set(JSON.parse(stored));
+    } catch {}
+    return new Set(DEFAULT_VISIBLE_COLS);
+  });
   const defaultColOrder = useMemo(() => COLUMN_GROUPS.flatMap(g => g.keys), []);
   const [colOrder, setColOrder] = useState(() => {
     try {
@@ -4022,6 +4028,9 @@ function App() {
   useEffect(() => {
     try { localStorage.setItem('cms_col_order', JSON.stringify(colOrder)); } catch {}
   }, [colOrder]);
+  useEffect(() => {
+    try { localStorage.setItem('cms_visible_cols', JSON.stringify([...visibleCols])); } catch {}
+  }, [visibleCols]);
 
   const [showImport, setShowImport] = useState(false);
   const [showBulkEdit, setShowBulkEdit] = useState(false);
