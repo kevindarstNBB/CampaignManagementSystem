@@ -22,12 +22,30 @@
   line-height: 1.5;
 }
 
-body { min-height: 100vh; }
+[data-theme="light"] {
+  --bg-primary: #f8f9fb;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #eef0f4;
+  --bg-hover: #e2e5eb;
+  --border: #d1d5dc;
+  --text-primary: #1a1d27;
+  --text-secondary: #4b5563;
+  --text-muted: #9ca3af;
+  --accent: #2563eb;
+  --accent-hover: #1d4ed8;
+  --green: #16a34a;
+  --amber: #d97706;
+  --red: #dc2626;
+  --purple: #7c3aed;
+}
+
+html { overflow-x: hidden; }
+body { min-height: 100vh; overflow-x: hidden; }
 #root { min-height: 100vh; }
 
 input, select, textarea, button { font-family: inherit; font-size: inherit; }
 
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: var(--bg-secondary); }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+::-webkit-scrollbar { width: 8px; height: 14px; }
+::-webkit-scrollbar-track { background: var(--bg-primary); }
+::-webkit-scrollbar-thumb { background: var(--text-muted); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-secondary); }

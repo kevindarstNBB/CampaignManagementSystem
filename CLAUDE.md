@@ -64,12 +64,71 @@ AMBA Legacy, Alumni, AOPA, ASME, CalBar, IEEE, MOAA, NYSUT, PGA, Allied Health, 
 - AD&D -> AD&D
 - CRITICAL ILLNESS -> Critical Illness
 
-## UI Requirements
-- Dark theme, professional look
-- Summary cards: Budget TAP, Actual TAP, Budget C/TAP, Actual C/TAP, Total Cost, Approvals
-- Filter bar: Identifier, Product, Channel, Client, Approval Status, Director, free-text search
-- Sortable data grid with color-coded C/TAP column
-- Summary view toggle: product-level rollup with aggregated TAP, cost, C/TAP
-- Click-to-open detail panel with tabs: Overview, Performance Chain, Blue Sheet, Export
-- Create/Edit modal with auto-calculating C/TAP
-- Seed data: actual client names (ADHA, AACN, ASHA, MOAA, Alumni, AOPA, ASME, IEEE) and real AE names (BORSKI, CAPPS, DEVLIN, FOGLE, SASH)
+## Current Features
+
+### UI Foundation
+- Title: AMBA Marketing Campaign Manager
+- Dark theme with CSS custom properties (--bg-primary: #0f1117, --accent: #3b82f6, etc.)
+- Fixed viewport-height layout: header + body fill 100vh, data grid fills remaining space with pinned scrollbars
+- Summary cards: Budget TAP, Actual TAP, Budget C/TAP (ratio, 3 decimals), Actual C/TAP, Total Cost, Approvals
+- Filter bar: Identifier (defaults to BUDGET), Year (multi-select checkboxes), Product, Channel, Channel Detail, Month (Jan-Dec, year-independent), Client, Approval Status, CFT Director, Team, free-text search
+- Per-column filters in grid header row: auto-detects enum (dropdown), number (supports >5, <10, 1-100), date (substring), text (substring)
+- Sortable data grid with color-coded C/TAP column (green < 5, amber 5-8, red > 8), horizontal scrollbar for many columns
+- 4 view modes: Detail Grid, Summary (with YOY), Calendar, Chart
+- Click-to-open detail panel (slide-out) with tabs: Overview, Performance Chain, Blue Sheet, Export, History
+- Create/Edit modal with auto-calculating C/TAP, GL mapping, quarter derivation from mail date
+- Seed data: Full AMBA_ONLY_PIPELINE loaded from `src/pipeline_data.json` (extracted from `O:/Marketing/Shared Reporting/Daily Pipelines/AMBA_ONLY_PIPELINE_2026.xlsx`)
+
+### Excel/CSV Import
+- SheetJS (xlsx) library for parsing .xlsx, .xls, .csv files
+- Drag-and-drop upload zone or click to browse
+- Column mapping: PROJ__ → PROJ_NUM (via IMPORT_COL_MAP)
+- Channel normalization: maps abbreviations (D, M, P, E, T, EC, etc.) to full PROJ_TYPE values
+- Preview screen: record count, identifier breakdown, top products, sample data table, missing field warnings
+- Two import modes: Replace All Data or Append to Existing
+- Auto-generates app-level fields (_approvalStatus, _expenseType, _specificExpense, _blueSheetClient, _blueSheetProduct, _monthlyBudget)
+- Toast notification on successful import
+
+### Bulk Actions
+- Persistent checkbox selection across sort/filter (Set-based ID tracking)
+- Select-all checkbox with indeterminate state; Ctrl+A keyboard shortcut
+- Bulk approval: set all selected records to any of the 5 approval statuses
+- Bulk field editing ("Edit" button): field picker dropdown (13 fields), enum/date/numeric modes (set/multiply/add), before→after preview for first 3 records, auto-recalculation of C/TAP
+- Bulk export: MOM Pipeline CSV, Blue Sheet CSV, Asana JSON for selected records
+- Deselect all link; selection clears after bulk edit apply
+
+### Inline Cell Editing
+- Double-click any editable cell to enter edit mode (single-click on editable cells does NOT open detail pane)
+- Editable fields: CFT_DIRECTOR, AE, PROJ_STATUS, PROJ_TYPE, PRODUCT, _approvalStatus, _expenseType (enum); MAIL_QTY, GROSS_APP, NET_APP, AAP, TAP, NEW_TOTAL_COST (number); MAIL_DATE (date); DETAIL, CLIENT_DESC (text)
+- Keyboard: Enter to commit, Escape to cancel, Tab/Shift+Tab to move between editable cells in same row
+- Auto-recalculation: C/TAP when cost or TAP changes, GL when expense type changes, Blue Sheet product when product changes, QTR/MAIL_MONTH/MAIL_DAY when mail date changes
+- Pencil icon hover cue on editable cells; cell flash animation on commit
+
+### Column Visibility & Reordering
+- Column picker dropdown with 7 grouped sections: Core, Performance, Project, Approval, Organization, Cost Detail, Flags (40+ total columns)
+- 14 default visible columns: Status, Identifier, Client, Product, Channel, Campaign, Mail Qty, TAP, C/TAP, Cost, Proj Status, AE, Director, Mail Date
+- Show All / Reset to Default / Reset Order links
+- Drag-and-drop column header reordering with visual drop indicator
+- Column order persisted to localStorage (survives refresh)
+- Display order is independent of export order (PIPELINE_FIELDS is a fixed constant)
+
+### Activity Log / Audit Trail
+- User identity: localStorage-persisted username, prompted on first load, changeable via header badge
+- Tracks all data mutations: inline edits, modal create/edit, bulk approval, bulk field edit, import (replace/append)
+- Log entry schema: id, timestamp, user, action, recordId, recordLabel, changes [{field, oldValue, newValue}], summary, batchId
+- Per-record History tab in detail panel: reverse-chronological timeline filtered to that campaign
+- Global Activity Log panel (header button): filterable by user, action type, free-text search; bulk operations grouped by batchId (collapsible); Export JSON and Clear Log buttons
+- Capped at 1,000 entries, persisted to localStorage
+
+### Three Export Formats
+- MOM/Pipeline CSV: all 59 fields in fixed PIPELINE_FIELDS order
+- Blue Sheet CSV: budget allocation with monthly columns, GL accounts, expense types
+- Asana JSON: task format with custom fields for project management
+- Available per-record (Export tab in detail panel) and in bulk (selected records or all filtered)
+
+## Backlog
+- SharePoint Lists backend via Microsoft Graph API (replace local state + seed data)
+- Azure AD multi-user authentication (replace localStorage username)
+- Power BI reporting layer integration
+- Undo/redo for edits
+- Component file splitting (App.jsx is currently ~2800+ lines single-file)
