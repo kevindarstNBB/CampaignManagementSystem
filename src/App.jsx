@@ -4171,7 +4171,31 @@ function App() {
     } catch { return []; }
   });
   const [currentUser, setCurrentUser] = useState(() => localStorage.getItem('cms_username') || '');
-  const [showUserPrompt, setShowUserPrompt] = useState(() => !localStorage.getItem('cms_username'));
+  const [showUserPrompt, setShowUserPrompt] = useState(false);
+  const [authLoaded, setAuthLoaded] = useState(false);
+
+  // Azure Static Web Apps auth: fetch logged-in user identity
+  useEffect(() => {
+    fetch('/.auth/me')
+      .then(res => res.ok ? res.json() : Promise.reject('no auth'))
+      .then(data => {
+        const principal = data?.clientPrincipal;
+        if (principal?.userDetails) {
+          const name = principal.userDetails;
+          setCurrentUser(name);
+          localStorage.setItem('cms_username', name);
+        } else if (!localStorage.getItem('cms_username')) {
+          setShowUserPrompt(true);
+        }
+      })
+      .catch(() => {
+        // Running locally without Azure auth — fall back to manual prompt
+        if (!localStorage.getItem('cms_username')) {
+          setShowUserPrompt(true);
+        }
+      })
+      .finally(() => setAuthLoaded(true));
+  }, []);
   const [showTour, setShowTour] = useState(() => !localStorage.getItem('cms_tour_seen'));
   const [seedDate, setSeedDate] = useState(() => localStorage.getItem('cms_seed_date') || '');
   const [showActivityLog, setShowActivityLog] = useState(false);
@@ -4765,9 +4789,15 @@ function App() {
           <button className="btn btn-sm" onClick={() => setTheme(t => t === 'dark' ? 'light' : 'dark')} title="Toggle theme">
             {theme === 'dark' ? '\u2600\uFE0F' : '\uD83C\uDF19'}
           </button>
-          <span className="user-badge" onClick={() => setShowUserPrompt(true)} title="Change user">
-            {currentUser || 'Set User'}
-          </span>
+          <div className="header-dropdown" tabIndex={0}>
+            <span className="user-badge" title={currentUser || 'Not signed in'}>
+              {currentUser || 'Set User'}
+            </span>
+            <div className="header-dropdown-menu">
+              {authLoaded && <a className="btn" href="/.auth/logout" style={{ textDecoration: 'none', display: 'block' }}>Sign Out</a>}
+              <button className="btn" onClick={() => setShowUserPrompt(true)}>Change Display Name</button>
+            </div>
+          </div>
           <button className="btn" onClick={() => setShowFeedback(true)}>Feedback</button>
           <div className="header-dropdown" tabIndex={0}>
             <button className="btn header-dropdown-btn">Tools</button>
