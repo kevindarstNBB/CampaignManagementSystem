@@ -23,9 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 
-# Real pipeline data (keep local only)
-src/pipeline_data.json
-
 # Azure Functions
 api/node_modules
 api/local.settings.json
