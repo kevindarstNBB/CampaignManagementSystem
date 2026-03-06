@@ -3473,6 +3473,74 @@ function Toast({ message, onClose }) {
   );
 }
 
+// ─── Welcome Tour ─────────────────────────────────────────────────────────────
+
+const TOUR_STEPS = [
+  {
+    icon: '\uD83D\uDCCA',
+    title: 'Welcome to the AMBA Campaign Manager',
+    desc: 'Your central hub for managing marketing campaigns, tracking pipeline data, and coordinating across teams. Let\u2019s take a quick look around.',
+  },
+  {
+    icon: '\uD83D\uDC41\uFE0F',
+    title: '4 Ways to See Your Data',
+    desc: 'Switch between Detail Grid for row-level data, Summary for rollups and YOY comparisons, Calendar for a monthly timeline, and Chart for visual breakdowns.',
+  },
+  {
+    icon: '\uD83D\uDD0D',
+    title: 'Filter & Focus',
+    desc: 'Use the filter bar to narrow by Identifier, Year, Product, Channel, and more. Quick-toggle presets like DV, PL, and Jumbo clients are right below the filters.',
+  },
+  {
+    icon: '\u270F\uFE0F',
+    title: 'Edit Right in the Grid',
+    desc: 'Double-click any highlighted cell to edit it inline. Select multiple rows with checkboxes for bulk edits, approvals, or deletions.',
+  },
+  {
+    icon: '\uD83D\uDCC1',
+    title: 'Import & Export',
+    desc: 'Drag and drop Excel or CSV files to import new pipeline data. Export to Pipeline CSV, Blue Sheet, Asana JSON, or Excel from the Export menu or Summary View.',
+  },
+  {
+    icon: '\uD83D\uDCAC',
+    title: 'Share Your Feedback',
+    desc: 'Click the Feedback button in the header to report bugs, request features, or flag anything that feels off. Your input helps us improve the tool.',
+  },
+];
+
+function WelcomeTour({ onClose }) {
+  const [step, setStep] = useState(0);
+  const s = TOUR_STEPS[step];
+  const isLast = step === TOUR_STEPS.length - 1;
+  const close = () => {
+    localStorage.setItem('cms_tour_seen', '1');
+    onClose();
+  };
+  return (
+    <div className="modal-overlay">
+      <div className="modal tour-modal" onClick={e => e.stopPropagation()}>
+        <div className="tour-step">
+          <div className="tour-icon">{s.icon}</div>
+          <h2 className="tour-title">{s.title}</h2>
+          <p className="tour-desc">{s.desc}</p>
+        </div>
+        <div className="tour-footer">
+          <button className="btn" onClick={close}>Skip</button>
+          <div className="tour-dots">
+            {TOUR_STEPS.map((_, i) => (
+              <span key={i} className={`tour-dot ${i === step ? 'active' : ''}`} />
+            ))}
+          </div>
+          {isLast
+            ? <button className="btn btn-primary" onClick={close}>Get Started</button>
+            : <button className="btn btn-primary" onClick={() => setStep(step + 1)}>Next</button>
+          }
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── User Prompt ──────────────────────────────────────────────────────────────
 
 function UserPrompt({ onSet, onClose, initialName }) {
@@ -4104,6 +4172,7 @@ function App() {
   });
   const [currentUser, setCurrentUser] = useState(() => localStorage.getItem('cms_username') || '');
   const [showUserPrompt, setShowUserPrompt] = useState(() => !localStorage.getItem('cms_username'));
+  const [showTour, setShowTour] = useState(() => !localStorage.getItem('cms_tour_seen'));
   const [seedDate, setSeedDate] = useState(() => localStorage.getItem('cms_seed_date') || '');
   const [showActivityLog, setShowActivityLog] = useState(false);
   const [showSessionChanges, setShowSessionChanges] = useState(false);
@@ -4703,6 +4772,7 @@ function App() {
           <div className="header-dropdown" tabIndex={0}>
             <button className="btn header-dropdown-btn">Tools</button>
             <div className="header-dropdown-menu">
+              <button className="btn" onClick={() => setShowTour(true)}>Welcome Tour</button>
               <button className="btn" onClick={() => setShowSessionChanges(true)}>Session Changes</button>
               <button className="btn" onClick={() => setShowActivityLog(true)}>Activity Log</button>
               <button className="btn" onClick={() => {
@@ -4929,6 +4999,10 @@ function App() {
           onSet={setCurrentUser}
           onClose={() => { if (currentUser) setShowUserPrompt(false); }}
         />
+      )}
+
+      {!showUserPrompt && showTour && (
+        <WelcomeTour onClose={() => setShowTour(false)} />
       )}
 
       {toast && <Toast message={toast} onClose={() => setToast(null)} />}
