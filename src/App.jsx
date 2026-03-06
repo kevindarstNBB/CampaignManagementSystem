@@ -3800,7 +3800,7 @@ function FeedbackPanel({ feedback, onSubmit, onClear, onClose, currentUser }) {
 
   const exportFeedback = () => {
     const d = new Date().toISOString().slice(0, 10);
-    downloadJSON(feedback, `CMS_Feedback_${d}.json`);
+    downloadExcel(feedback, `CMS_Feedback_${d}`);
   };
 
   const timeAgo = (ts) => {
@@ -3853,7 +3853,7 @@ function FeedbackPanel({ feedback, onSubmit, onClear, onClose, currentUser }) {
 
           <div className="feedback-toolbar">
             <span className="feedback-count">{filtered.length} item{filtered.length !== 1 ? 's' : ''}</span>
-            <button className="btn btn-sm" onClick={exportFeedback}>Export JSON</button>
+            <button className="btn btn-sm" onClick={exportFeedback}>Export Excel</button>
             <button className="btn btn-sm btn-danger" onClick={onClear}>Clear Mine</button>
           </div>
 
